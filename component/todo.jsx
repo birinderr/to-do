@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 
 export default function Todo() {
   const [task, setTask] = useState('');
+  const [priority, setPriority] = useState('medium');
   const [todos, setTodos] = useState([]);
 
   const handleAdd = () => {
     const trimmedTask = task.trim();
     if (trimmedTask === '') return;
-    setTodos([...todos, { text: trimmedTask, done: false }]);
+    setTodos([...todos, { text: trimmedTask, done: false, priority }]);
     setTask('');
+    setPriority('medium');
   };
 
   const handleDelete = (index) => {
@@ -23,27 +25,49 @@ export default function Todo() {
     setTodos(updatedTodos);
   };
 
-  const pendingCount = todos.filter((todo) => !todo.done).length;
-  const doneCount = todos.filter((todo) => todo.done).length;
+  const pendingTodos = todos.filter((todo) => !todo.done);
+  const completedTodos = todos.filter((todo) => todo.done);
+
+  const renderPriorityBadge = (level) => {
+    const base = 'text-xs font-semibold px-2 py-0.5 rounded';
+    switch (level) {
+      case 'high':
+        return <span className={`${base} bg-red-100 text-red-700`}>High</span>;
+      case 'low':
+        return <span className={`${base} bg-blue-100 text-blue-700`}>Low</span>;
+      default:
+        return <span className={`${base} bg-yellow-100 text-yellow-700`}>Medium</span>;
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto mt-16 p-6 bg-white rounded-xl shadow-md font-sans">
       <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">Todo App</h2>
 
-      {/* Task Summary */}
+      {/* Summary */}
       <div className="text-sm text-center text-gray-600 mb-4">
-        {pendingCount} pending, {doneCount} completed
+        {pendingTodos.length} pending, {completedTodos.length} completed
       </div>
 
-      <div className="flex mb-4">
+      {/* Input Section */}
+      <div className="flex flex-col sm:flex-row mb-4 gap-2 sm:gap-4">
         <input
           type="text"
           value={task}
           placeholder="Enter a task..."
           onChange={(e) => setTask(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-          className="flex-grow px-4 py-2 border border-gray-300 rounded-md mr-2 text-base focus:outline-none focus:ring-2 focus:ring-green-300"
+          className="flex-grow px-4 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-green-300"
         />
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none"
+        >
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
         <button
           onClick={handleAdd}
           className="px-4 py-2 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition"
@@ -56,41 +80,71 @@ export default function Todo() {
       {todos.length === 0 ? (
         <p className="text-center text-gray-500 mt-6">No tasks yet. Add one above! 🚀</p>
       ) : (
-        <ul className="list-none p-0">
-          {todos.map((item, index) => (
-            <li
-              key={index}
-              className={`flex items-center justify-between p-3 mb-3 rounded-md shadow-sm ${
-                index % 2 === 0 ? 'bg-gray-100' : 'bg-white'
-              }`}
-            >
-              <span
-                className={`flex-1 mr-4 text-base break-words ${
-                  item.done ? 'line-through text-gray-400' : 'text-gray-800'
-                }`}
-              >
-                {item.text}
-              </span>
-
-              <div className="flex gap-2">
-                {!item.done && (
-                  <button
-                    onClick={() => handleMarkDone(index)}
-                    className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+        <>
+          {/* Pending Section */}
+          {pendingTodos.length > 0 && (
+            <div className="mb-6">
+              <h3 className="font-semibold text-lg text-gray-700 mb-2">Pending</h3>
+              <ul className="list-none p-0 space-y-3">
+                {pendingTodos.map((item, index) => (
+                  <li
+                    key={`pending-${index}`}
+                    className="flex items-center justify-between p-3 bg-gray-100 rounded-md shadow-sm transition-all duration-300 ease-in-out transform hover:scale-[1.01]"
                   >
-                    Mark as Done
-                  </button>
-                )}
-                <button
-                  onClick={() => handleDelete(index)}
-                  className="px-3 py-1 bg-red-600 text-white rounded-md text-sm font-semibold hover:bg-red-700 transition"
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                    <div className="flex-1 mr-4">
+                      <span className="block text-base text-gray-800 break-words">
+                        {item.text}
+                      </span>
+                      <div className="mt-1">{renderPriorityBadge(item.priority)}</div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleMarkDone(todos.indexOf(item))}
+                        className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+                      >
+                        Mark as Done
+                      </button>
+                      <button
+                        onClick={() => handleDelete(todos.indexOf(item))}
+                        className="px-3 py-1 bg-red-600 text-white rounded-md text-sm font-semibold hover:bg-red-700 transition"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Completed Section */}
+          {completedTodos.length > 0 && (
+            <div>
+              <h3 className="font-semibold text-lg text-gray-700 mb-2">Completed</h3>
+              <ul className="list-none p-0 space-y-3">
+                {completedTodos.map((item, index) => (
+                  <li
+                    key={`done-${index}`}
+                    className="flex items-center justify-between p-3 bg-white rounded-md shadow-sm opacity-80 transition-all duration-300 ease-in-out"
+                  >
+                    <div className="flex-1 mr-4">
+                      <span className="block text-base text-gray-400 line-through break-words">
+                        {item.text}
+                      </span>
+                      <div className="mt-1">{renderPriorityBadge(item.priority)}</div>
+                    </div>
+                    <button
+                      onClick={() => handleDelete(todos.indexOf(item))}
+                      className="px-3 py-1 bg-red-600 text-white rounded-md text-sm font-semibold hover:bg-red-700 transition"
+                    >
+                      Delete
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
