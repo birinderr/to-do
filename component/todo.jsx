@@ -24,45 +24,54 @@ export default function Todo() {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>Todo App</h2>
-      <div style={styles.inputContainer}>
+    <div className="max-w-md mx-auto mt-16 p-6 bg-white rounded-xl shadow-md font-sans">
+      <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Todo App</h2>
+      
+      <div className="flex mb-4 animate-bounce">
         <input
           type="text"
           value={task}
           placeholder="Enter a task..."
           onChange={(e) => setTask(e.target.value)}
-          style={styles.input}
+          className="flex-grow px-4 py-2 border border-gray-300 rounded-md mr-2 text-base focus:outline-none focus:ring-2 focus:ring-green-300"
         />
-        <button onClick={handleAdd} style={styles.addButton}>
+        <button
+          onClick={handleAdd}
+          className="px-4 py-2 bg-green-600 text-white rounded-md font-semibold hover:bg-green-700 transition"
+        >
           Add
         </button>
       </div>
-      <ul style={styles.list}>
+
+      <ul className="list-none p-0">
         {todos.map((item, index) => (
           <li
             key={index}
-            style={{
-              ...styles.listItem,
-              backgroundColor: index % 2 === 0 ? '#f1f1f1' : '#ffffff',
-            }}
+            className={`flex items-center justify-between p-3 mb-3 rounded-md shadow-sm ${
+              index % 2 === 0 ? 'bg-gray-100' : 'bg-white'
+            }`}
           >
             <span
-              style={{
-                ...styles.listText,
-                textDecoration: item.done ? 'line-through' : 'none',
-                color: item.done ? '#999' : '#333',
-              }}
+              className={`flex-1 mr-4 text-base break-words ${
+                item.done ? 'line-through text-gray-400' : 'text-gray-800'
+              }`}
             >
               {item.text}
             </span>
-            <div style={styles.buttonGroup}>
+
+            <div className="flex gap-2">
               {!item.done && (
-                <button onClick={() => handleMarkDone(index)} style={styles.doneButton}>
+                <button
+                  onClick={() => handleMarkDone(index)}
+                  className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm font-semibold hover:bg-blue-700 transition"
+                >
                   Mark as Done
                 </button>
               )}
-              <button onClick={() => handleDelete(index)} style={styles.deleteButton}>
+              <button
+                onClick={() => handleDelete(index)}
+                className="px-3 py-1 bg-red-600 text-white rounded-md text-sm font-semibold hover:bg-red-700 transition"
+              >
                 Delete
               </button>
             </div>
@@ -72,84 +81,3 @@ export default function Todo() {
     </div>
   );
 }
-
-
-const styles = {
-  container: {
-    maxWidth: '500px',
-    margin: '60px auto',
-    padding: '25px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-    backgroundColor: '#fefefe',
-    fontFamily: 'Arial, sans-serif',
-  },
-  heading: {
-    textAlign: 'center',
-    color: '#222',
-    fontSize: '24px',
-    marginBottom: '20px',
-  },
-  inputContainer: {
-    display: 'flex',
-    marginBottom: '20px',
-  },
-  input: {
-    flex: 1,
-    padding: '10px',
-    borderRadius: '6px',
-    border: '1px solid #bbb',
-    marginRight: '10px',
-    fontSize: '16px',
-  },
-  addButton: {
-    padding: '10px 16px',
-    backgroundColor: '#28a745',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-  },
-  list: {
-    listStyleType: 'none',
-    padding: 0,
-  },
-  listItem: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px 15px',
-    marginBottom: '10px',
-    borderRadius: '6px',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-  },
-  listText: {
-    fontSize: '16px',
-    flex: 1,
-    marginRight: '10px',
-    wordBreak: 'break-word',
-  },
-  buttonGroup: {
-    display: 'flex',
-    gap: '8px',
-  },
-  deleteButton: {
-    backgroundColor: '#dc3545',
-    border: 'none',
-    color: 'white',
-    padding: '8px 12px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-  },
-  doneButton: {
-    backgroundColor: '#007bff',
-    border: 'none',
-    color: 'white',
-    padding: '8px 12px',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    fontWeight: 'bold',
-  },
-};
